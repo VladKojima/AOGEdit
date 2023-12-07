@@ -1,0 +1,10 @@
+body{
+    font-size: 14pt;
+}
+#main{
+    display: flex;
+}
+
+#inputs{
+    margin-right: 30px;
+}
