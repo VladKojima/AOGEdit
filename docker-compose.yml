@@ -1,12 +1,4 @@
 services:
-  app:
-    build: ./app
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
   
   db:
     image: postgres:latest
@@ -18,3 +10,19 @@ services:
     expose:
       - 5432
     restart: always
+    healthcheck:
+      test: >
+        psql -U postgres
+      interval: ${HC_INTERVAL}
+      timeout: ${HC_TIMEOUT}
+      retries: ${HC_RETRIES}
+
+  app:
+    build: ./app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
