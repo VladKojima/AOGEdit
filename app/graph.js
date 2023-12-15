@@ -34,3 +34,34 @@ class GOr {
         return this.events.reduce((x, y) => new GEvent(x.calc + y.calc - x.calc * y.calc, 1)).calc;
     }
 }
+
+let events = [];
+let counter = 0;
+
+window.onload = () => {
+    addEvent.onclick = () => {
+        let ev = new GEvent(0, 0);
+
+        ev.id = ++counter;
+
+        events.push(ev);
+
+        let elem = document.createElement('div');
+        elem.append(document.querySelector("#eventList>template").content.cloneNode(true));
+
+        let spans = elem.querySelectorAll('span');
+
+        spans[0].textContent = counter;
+
+        elem.querySelectorAll('button')[1].onclick = () => {
+            events = events.filter(x => x !== ev);
+            eventList.removeChild(elem);
+        }
+
+        elem.querySelector('button').onclick = () => {
+
+        }
+
+        eventList.append(elem);
+    }
+}

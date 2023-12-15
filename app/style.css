@@ -1,5 +1,6 @@
 body{
     font-size: 14pt;
+    background: cadetblue
 }
 #main{
     display: flex;
@@ -7,4 +8,41 @@ body{
 
 #inputs{
     margin-right: 30px;
+}
+
+#graphEdit{
+    display: flex;
+    align-items: flex-start;
+}
+
+#eventList{
+    background: darkslategrey;
+    margin-right: 10px;
+    padding: 5px;
+    width: 250px;
+    color: beige;
+}
+
+#relList{
+    margin-top: 10px;
+    padding: 5px;
+    background: darkslateblue;
+}
+
+#addEvent{
+    margin-right: 10px;
+}
+
+.eventInfo{
+    display: flex;
+    align-items: center;
+    color: beige;
+}
+
+.eventInfo > p{
+    margin: auto 10px;
+}
+
+.eventInfo > button{
+    margin: auto 10px;
 }
