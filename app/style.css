@@ -1,48 +1,59 @@
-body{
+body {
     font-size: 14pt;
-    background: cadetblue
+    background: cadetblue;
+    color: beige;
 }
-#main{
+
+#main {
     display: flex;
 }
 
-#inputs{
+#inputs {
     margin-right: 30px;
 }
 
-#graphEdit{
+#graphEdit {
     display: flex;
     align-items: flex-start;
 }
 
-#eventList{
+#eventList {
     background: darkslategrey;
     margin-right: 10px;
     padding: 5px;
     width: 250px;
     color: beige;
+    overflow: hidden;
 }
 
-#relList{
+#relList {
     margin-top: 10px;
     padding: 5px;
     background: darkslateblue;
 }
 
-#addEvent{
+#addEvent {
     margin-right: 10px;
 }
 
-.eventInfo{
+.eventInfo {
     display: flex;
     align-items: center;
     color: beige;
 }
 
-.eventInfo > p{
+.eventInfo>p {
     margin: auto 10px;
 }
 
-.eventInfo > button{
+.eventInfo>button {
     margin: auto 10px;
+}
+
+.eventNameIn {
+    color: #e7aeff;
+}
+
+.eventNameOut {
+    color: orange !important;
 }

@@ -1,44 +1,48 @@
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>AndOrGraph maker</title>
-        <script src="./graph.js"></script>
-        <link href="./style.css" rel="stylesheet">
-    </head>
 
-    <body>
+<head>
+    <meta charset="utf-8">
+    <title>AndOrGraph maker</title>
+    <script src="./graph.js"></script>
+    <link href="./style.css" rel="stylesheet">
+</head>
 
-        <div id = "graphEdit">
-            <div id = "eventList">
+<body>
+
+    <div id="graphEdit">
+        <div id="eventList">
+            <template class="eventInfo">
+                <p><span>0</span> <span>1</span> <span>Event</span> <span></span></p>
+                <button>Edit</button>
+                <button>Remove</button>
+            </template>
+        </div>
+        <button id="addEvent">Add</button>
+        <div id="eventEdit">
+            <span name="id">0</span>
+            <input type="text" name="name" title="name">
+            <input type="number" min="1" max="1" name="p" title="p">
+            <select name="type" title="type">
+                <option value="In">In</option>
+                <option value="Event">Event</option>
+                <option value="And">And</option>
+                <option value="Or">Or</option>
+            </select>
+            <input type="checkbox" name="isOut">
+            <span>is Out</span>
+            <div id="relList">
                 <template class="eventInfo">
-                    <p><span>0</span> <span>0.00</span> <span>Event</span></p>
-                    <button>Edit</button>
-                    <button>Remove</button>
+                    <p name="id">0</p>
+                    <input type="checkbox">
                 </template>
             </div>
-            <button id="addEvent">Add</button>
-            <div id = "eventEdit">
-                <input type="text" name="name" title="name">
-                <input type="number" min = "1" max = "1" name="p" title="p">
-                <select name="type" title="type">
-                    <option>In</option>
-                    <option>Event</option>
-                    <option>And</option>
-                    <option>Or</option>
-                    <option>Out</option>
-                </select>
-                <div id="relList">
-                    <template class="eventInfo">
-                        <p>0</p>
-                        <input type="checkbox">
-                    </template>
-                </div>
-            </div>
         </div>
+    </div>
 
-        <div id = "graphUse">
-            <div id="inputs"></div>
-            <div id="outputs"></div>
-        </div>
-    </body>
+    <div id="graphUse">
+        <div id="inputs"></div>
+        <div id="outputs"></div>
+    </div>
+</body>
+
 </html>
