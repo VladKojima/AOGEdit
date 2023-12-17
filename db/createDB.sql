@@ -11,45 +11,86 @@ CREATE TABLE public.events
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     label character varying(50) COLLATE pg_catalog."default" NOT NULL,
     save integer NOT NULL,
+    isout boolean NOT NULL,
     CONSTRAINT events_pkey PRIMARY KEY (id),
     CONSTRAINT events_save_fkey FOREIGN KEY (save)
         REFERENCES public.saves (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 );
-
-CREATE TABLE public.ands
-(
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    p double precision NOT NULL,
-    CONSTRAINT ands_pkey PRIMARY KEY (id),
-    CONSTRAINT check_p CHECK (p >= 0::double precision AND p <= 1::double precision)
-);
-
 
 CREATE TABLE public.event_to_and
 (
     event integer NOT NULL,
-    "and" integer NOT NULL,
-    CONSTRAINT ea UNIQUE (event, "and"),
-    CONSTRAINT event_to_and_and_fkey FOREIGN KEY ("and")
-        REFERENCES public.ands (id) MATCH SIMPLE
+    toevent integer NOT NULL,
+    CONSTRAINT ete UNIQUE (event, toevent),
+    CONSTRAINT ete_fkey FOREIGN KEY (event)
+        REFERENCES public.events (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE,
-    CONSTRAINT event_to_and_event_fkey FOREIGN KEY (event)
+    CONSTRAINT ete_fkey2 FOREIGN KEY (toevent)
         REFERENCES public.events (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 );
 
-CREATE TABLE public."or"
+CREATE TABLE public.event_to_or
 (
     event integer NOT NULL,
     toevent integer NOT NULL,
-    p double precision NOT NULL,
-    CONSTRAINT ete UNIQUE (event, toevent),
-    CONSTRAINT check_p2 CHECK (p >= 0::double precision AND p <= 1::double precision)
+    CONSTRAINT ete2 UNIQUE (event, toevent),
+    CONSTRAINT ete2_fkey FOREIGN KEY (event)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE,
+    CONSTRAINT ete2_fkey2 FOREIGN KEY (toevent)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
 );
+
+CREATE TABLE public.event_to_event
+(
+    event integer NOT NULL,
+    toevent integer NOT NULL,
+    CONSTRAINT ete3 UNIQUE (event),
+    CONSTRAINT ete3_fkey FOREIGN KEY (event)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE,
+    CONSTRAINT ete3_fkey2 FOREIGN KEY (toevent)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+
+CREATE FUNCTION public.addin(
+	label character varying,
+	save integer,
+	isout boolean)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+AS $BODY$
+declare
+	res integer;
+begin
+	insert into events(label, save, isout) values (label, save, isout) returning id into res;
+	return res;
+end
+$BODY$;
+
+CREATE FUNCTION public.addsave(
+	title character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+AS $BODY$
+declare
+	res integer;
+begin
+	insert into saves(title) values (title) returning id into res;
+	return res;
+end
+$BODY$;
 
 CREATE ROLE app WITH
   NOLOGIN
