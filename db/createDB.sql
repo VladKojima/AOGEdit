@@ -10,6 +10,7 @@ CREATE TABLE public.events
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     label character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    multiplier double precision NOT NULL,
     save integer NOT NULL,
     isout boolean NOT NULL,
     CONSTRAINT events_pkey PRIMARY KEY (id),
@@ -66,6 +67,7 @@ CREATE TABLE public.event_to_event
 
 CREATE FUNCTION public.addin(
 	label character varying,
+    multiplier double precision,
 	save integer,
 	isout boolean)
     RETURNS integer
@@ -74,7 +76,7 @@ AS $BODY$
 declare
 	res integer;
 begin
-	insert into events(label, save, isout) values (label, save, isout) returning id into res;
+	insert into events(label, multiplier, save, isout) values (label, multiplier, save, isout) returning id into res;
 	return res;
 end
 $BODY$;

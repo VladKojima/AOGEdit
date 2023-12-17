@@ -20,7 +20,7 @@ body {
     margin-right: 10px;
 }
 
-#eventList {
+.list {
     background: darkslategrey;
     margin-right: 10px;
     padding: 5px;
@@ -50,7 +50,7 @@ body {
     margin-right: 10px;
 }
 
-#useButton{
+#useButton, #calcButton, #saveButton{
     margin-right: 10px;
 }
 

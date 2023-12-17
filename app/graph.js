@@ -73,7 +73,7 @@ window.onload = () => {
 
             if (editable) getListFor(editable);
 
-            calcButton.disabled = true;
+            saveButton.disabled = calcButton.disabled = true;
         }
 
         elem.querySelector('button').onclick = () => {
@@ -111,7 +111,7 @@ window.onload = () => {
 
                 getListFor(ev);
 
-                calcButton.disabled = true;
+                saveButton.disabled = calcButton.disabled = true;
             };
 
             eventEdit.querySelector('[name=isOut]').onchange = ({ target: { checked } }) => {
@@ -194,7 +194,7 @@ window.onload = () => {
                 res.querySelector('input').onchange = ({ target }) => {
                     if (ev.type == 'In') return;
 
-                    calcButton.disabled = true;
+                    saveButton.disabled = calcButton.disabled = true;
 
                     if (ev.type == 'Event') {
                         if (target.checked == false) {
@@ -272,13 +272,43 @@ window.onload = () => {
             eWrapper.span = spans[1];
         }
 
-        calcButton.disabled = [false, ...events].reduce((x, y) => x || (y.event.value == undefined && (!y.event.events || y.event.events.length == 0)));
+        saveButton.disabled = calcButton.disabled = [outEvents.length == 0, ...events].reduce((x, y) => x || (y.event.value == undefined && (!y.event.events || y.event.events.length == 0)));
 
         calcButton.onclick = () => {
             for (let eWrapper of outEvents) {
                 eWrapper.span.textContent = eWrapper.event.calc;
             }
         }
-    }
+    };
 
+    saveButton.onclick = () => {
+        if (saveName.value.trim().length == 0) {
+            alert('Enter save name!');
+            return;
+        }
+
+        let data = events.map(x => {
+            let res = Object.assign({}, x);
+
+            if (res.event instanceof GEvent && res.event.value instanceof AbstractGEvent)
+                res.event.value = events.find(item => item.event == res.event.value).id;
+
+            if (res.event instanceof GAnd || res.event instanceof GOr)
+                res.event.events = events.filter(item => res.event.events.includes(item.event)).map(item => item.id);
+
+            return res;
+        });
+
+        fetch('/api/addSave?title=' + saveName.value, { method: 'post', body: JSON.stringify(data) });
+    };
+
+    fetch('/api/list').then(data => data.json().then(parsed => parsed.forEach(x => {
+        let el = document.createElement('div');
+
+        el.append(saveList.querySelector('template').content.cloneNode(true));
+
+        el.querySelector('span').textContent = x.title;
+
+        saveList.append(el);
+    })));
 }
