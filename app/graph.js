@@ -54,12 +54,79 @@ window.onload = () => {
 
         events.push(ev);
 
+        buildElement(ev);
+    }
+
+    function eventWrapper(id, type = 'Event', name = '') {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.isOut = false;
+        this.event = new GEvent(undefined, 1);
+    }
+
+    eventWrapper.prototype = {
+        changeType: function (type) {
+            if (type == this.type)
+                return;
+
+            if (!['In', 'Event', 'Or', 'And'].includes(type))
+                throw Error('Invalid type');
+
+            this.type = type;
+
+            switch (type) {
+                case 'In':
+                case 'Event':
+                    if (this.event instanceof GEvent) {
+                        this.event.value = undefined;
+                        break;
+                    }
+                    this.event = new GEvent(undefined, this.event.multiplier);
+                    break;
+                case 'And':
+                    this.event = new GAnd(this.event.multiplier);
+                    break;
+                case 'Or':
+                    this.event = new GOr(this.event.multiplier);
+                    break;
+            }
+        }
+    }
+
+    function recurCheck(ev1, ev2) {
+        if (ev2 instanceof GEvent) {
+            if (ev2.value == ev1) return true;
+
+            if (ev2.value instanceof AbstractGEvent) return recurCheck(ev1, ev2.value);
+        }
+
+        if (ev2 instanceof GOr || ev2 instanceof GAnd) {
+            if (ev2.events.includes(ev1))
+                return true;
+
+            return [false, ...ev2.events].reduce((x, y) => x || recurCheck(ev1, y));
+        }
+
+
+    }
+
+    function buildElement(ev) {
+
         let elem = document.createElement('div');
         elem.append(eventList.querySelector("template").content.cloneNode(true));
 
         let spans = elem.querySelectorAll('span');
 
-        spans[0].textContent = counter;
+        spans[0].textContent = ev.id;
+        spans[1].textContent = ev.event.multiplier;
+        spans[2].textContent = ev.type;
+        spans[3].textContent = ev.name;
+
+        if (ev.type == 'In')
+            spans[2].classList.add('eventNameIn');
+        if (ev.isOut)
+            spans[2].classList.add('eventNameOut');
 
         elem.querySelectorAll('button')[1].onclick = () => {
             events = events.filter(x => x !== ev);
@@ -126,58 +193,6 @@ window.onload = () => {
         }
 
         eventList.append(elem);
-    }
-
-    function eventWrapper(id, type = 'Event', name = '') {
-        this.id = id;
-        this.type = type;
-        this.name = name;
-        this.isOut = false;
-        this.event = new GEvent(undefined, 1);
-
-        this.changeType = (type) => {
-            if (type == this.type)
-                return;
-
-            if (!['In', 'Event', 'Or', 'And'].includes(type))
-                throw Error('Invalid type');
-
-            this.type = type;
-
-            switch (type) {
-                case 'In':
-                case 'Event':
-                    if (this.event instanceof GEvent) {
-                        this.event.value = undefined;
-                        break;
-                    }
-                    this.event = new GEvent(undefined, this.event.multiplier);
-                    break;
-                case 'And':
-                    this.event = new GAnd(this.event.multiplier);
-                    break;
-                case 'Or':
-                    this.event = new GOr(this.event.multiplier);
-                    break;
-            }
-        }
-    }
-
-    function recurCheck(ev1, ev2) {
-        if (ev2 instanceof GEvent) {
-            if (ev2.value == ev1) return true;
-
-            if (ev2.value instanceof AbstractGEvent) return recurCheck(ev1, ev2.value);
-        }
-
-        if (ev2 instanceof GOr || ev2 instanceof GAnd) {
-            if (ev2.events.includes(ev1))
-                return true;
-
-            return [false, ...ev2.events].reduce((x, y) => x || recurCheck(ev1, y));
-        }
-
-
     }
 
     function getListFor(ev) {
@@ -308,6 +323,52 @@ window.onload = () => {
         el.append(saveList.querySelector('template').content.cloneNode(true));
 
         el.querySelector('span').textContent = x.title;
+
+        el.querySelector('button').onclick = () => {
+            fetch('/api/loadSave?id=' + x.id).then(response => response.json().then(data => {
+                events = data;
+
+                for (let wrapper of events) {
+                    wrapper.name = wrapper.label;
+                    delete wrapper.label;
+                    wrapper.isOut = wrapper.isout;
+                    delete wrapper.isout;
+
+                    switch (wrapper.type) {
+                        case 'In':
+                        case 'Event':
+                            wrapper.event = new GEvent(undefined, wrapper.multiplier);
+                            break;
+                        case 'Or':
+                            wrapper.event = new GOr(wrapper.multiplier);
+                            break;
+                        case 'And':
+                            wrapper.event = new GAnd(wrapper.multiplier);
+                            break;
+                    }
+
+                    delete wrapper.multiplier;
+
+                    Object.setPrototypeOf(wrapper, eventWrapper.prototype);
+                }
+
+                for (let wrapper of events.filter(x => x.type == 'Event')) {
+                    wrapper.event.value = events.find(x => x.id == wrapper.value).event;
+
+                    delete wrapper.value;
+                }
+
+                for (let wrapper of events.filter(x => ['And', 'Or'].includes(x.type))) {
+                    wrapper.event.events = wrapper.events.map(x => events.find(y => y.id == x).event);
+
+                    delete wrapper.events;
+                }
+
+                eventList.replaceChildren(eventList.children[0]);
+
+                events.forEach(item => buildElement(item));
+            }));
+        };
 
         saveList.append(el);
     })));

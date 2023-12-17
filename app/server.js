@@ -28,7 +28,38 @@ let requests = {
             return;
         }
 
+        let data = (await client.query({ text: "SELECT * FROM events where save = $1", values: [args.id] })).rows;
 
+        for (let e of data) {
+            let eventLink = (await client.query({ text: 'select * from event_to_event where event = $1', values: [e.id] })).rows[0];
+
+            if (eventLink) {
+                e.type = 'Event';
+                e.value = eventLink['toevent'];
+            }
+
+            let orLink = (await client.query({ text: 'select * from event_to_or where toevent = $1', values: [e.id] })).rows;
+
+            if (orLink.length != 0) {
+                e.type = 'Or';
+                e.events = orLink.map(x => x['event']);
+            }
+
+            let andLink = (await client.query({ text: 'select * from event_to_and where toevent = $1', values: [e.id] })).rows;
+
+            if (andLink.length != 0) {
+                e.type = 'And';
+                e.events = andLink.map(x => x['event']);
+            }
+
+            if (!e.type)
+                e.type = 'In';
+
+            delete e.save;
+        }
+
+        res.statusCode = 200;
+        res.end(JSON.stringify(data));
     },
 
     "addSave": async (res, args, body) => {
@@ -48,7 +79,7 @@ let requests = {
             }
 
             for (let wrapper of body.filter(x => x.type == 'Event')) {
-                client.query({ text: 'insert into event_to_event(event, toevent) values ($1, $2)', values: [idMap[wrapper.event.value], idMap[wrapper.id]] });
+                client.query({ text: 'insert into event_to_event(event, toevent) values ($1, $2)', values: [idMap[wrapper.id], idMap[wrapper.event.value]] });
             }
 
             for (let wrapper of body.filter(x => x.type == 'And')) {
@@ -57,7 +88,6 @@ let requests = {
             }
 
             for (let wrapper of body.filter(x => x.type == 'Or')) {
-                console.log(wrapper);
                 for (let id of wrapper.event.events)
                     client.query({ text: 'insert into event_to_or(event, toevent) values ($1, $2)', values: [idMap[id], idMap[wrapper.id]] });
             }
