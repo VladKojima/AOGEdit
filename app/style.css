@@ -2,6 +2,8 @@ body {
     font-size: 14pt;
     background: cadetblue;
     color: beige;
+    display: flex;
+    align-items: flex-start;
 }
 
 #main {
@@ -15,6 +17,7 @@ body {
 #graphEdit {
     display: flex;
     align-items: flex-start;
+    margin-right: 10px;
 }
 
 #eventList {
@@ -23,16 +26,31 @@ body {
     padding: 5px;
     width: 250px;
     color: beige;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 80vh;
 }
 
 #relList {
     margin-top: 10px;
     padding: 5px;
     background: darkslateblue;
+    overflow-y: scroll;
+    max-height: 75vh;
 }
 
 #addEvent {
+    margin-right: 10px;
+}
+
+#graphUse{
+    background: #8A295A;
+    display: flex;
+    align-items: flex-start;
+    margin-right: 10px;
+}
+
+#useButton{
     margin-right: 10px;
 }
 

@@ -72,6 +72,8 @@ window.onload = () => {
             eventList.removeChild(elem);
 
             if (editable) getListFor(editable);
+
+            calcButton.disabled = true;
         }
 
         elem.querySelector('button').onclick = () => {
@@ -93,7 +95,7 @@ window.onload = () => {
                 if (value > 1 || value < 0)
                     value = 0;
 
-                ev.event.multiplier = value;
+                ev.event.multiplier = +value;
 
                 spans[1].textContent = value;
             };
@@ -108,6 +110,8 @@ window.onload = () => {
                 else spans[2].classList.remove('eventNameIn');
 
                 getListFor(ev);
+
+                calcButton.disabled = true;
             };
 
             eventEdit.querySelector('[name=isOut]').onchange = ({ target: { checked } }) => {
@@ -143,8 +147,10 @@ window.onload = () => {
             switch (type) {
                 case 'In':
                 case 'Event':
-                    if (this.event instanceof GEvent)
+                    if (this.event instanceof GEvent) {
+                        this.event.value = undefined;
                         break;
+                    }
                     this.event = new GEvent(undefined, this.event.multiplier);
                     break;
                 case 'And':
@@ -187,6 +193,9 @@ window.onload = () => {
 
                 res.querySelector('input').onchange = ({ target }) => {
                     if (ev.type == 'In') return;
+
+                    calcButton.disabled = true;
+
                     if (ev.type == 'Event') {
                         if (target.checked == false) {
                             ev.event.value = undefined;
@@ -216,4 +225,60 @@ window.onload = () => {
 
         relList.replaceChildren(...nodelist);
     }
+
+
+    useButton.onclick = () => {
+
+        let outEvents = events.filter(x => x.isOut);
+
+        inputs.replaceChildren(inputs.children[0]);
+        outputs.replaceChildren(outputs.children[0]);
+
+        for (let eWrapper of events.filter(x => x.type == 'In')) {
+            let el = document.createElement('div');
+
+            el.append(inputs.querySelector("template").content.cloneNode(true));
+
+            let spans = el.querySelectorAll('span');
+
+            eWrapper.event.value = 0;
+
+            spans[0].textContent = eWrapper.id;
+            spans[1].textContent = eWrapper.name;
+
+            el.querySelector('input').onchange = ({ target: { value } }) => {
+                if (value > 1 || value < 0)
+                    value = 0;
+
+                eWrapper.event.value = +value;
+            }
+
+            inputs.append(el);
+        }
+
+        for (let eWrapper of outEvents) {
+            let el = document.createElement('div');
+
+            el.append(outputs.querySelector("template").content.cloneNode(true));
+
+            let spans = el.querySelectorAll('span');
+
+            spans[0].textContent = eWrapper.id;
+            spans[1].textContent = 0;
+            spans[2].textContent = eWrapper.name;
+
+            outputs.append(el);
+
+            eWrapper.span = spans[1];
+        }
+
+        calcButton.disabled = [false, ...events].reduce((x, y) => x || (y.event.value == undefined && (!y.event.events || y.event.events.length == 0)));
+
+        calcButton.onclick = () => {
+            for (let eWrapper of outEvents) {
+                eWrapper.span.textContent = eWrapper.event.calc;
+            }
+        }
+    }
+
 }

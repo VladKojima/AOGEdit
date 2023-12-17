@@ -32,17 +32,33 @@
             <span>is Out</span>
             <div id="relList">
                 <template class="eventInfo">
-                    <p name="id">0</p>
+                    <span name="id">0</span>
                     <input type="checkbox">
                 </template>
             </div>
         </div>
     </div>
 
+    <button id="useButton">Check</button>
+
     <div id="graphUse">
-        <div id="inputs"></div>
-        <div id="outputs"></div>
+        <div id="inputs">
+            <template>
+                <span>0</span>
+                <input type="number" min="0" max="1">
+                <span>name</span>
+            </template>
+        </div>
+        <div id="outputs">
+            <template>
+                <span>0</span>
+                <span>0</span>
+                <span>name</span>
+            </template>
+        </div>
     </div>
+    
+    <button id="calcButton" disabled>Calc</button>
 </body>
 
 </html>
