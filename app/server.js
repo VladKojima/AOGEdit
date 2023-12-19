@@ -5,10 +5,10 @@ const pg = require('pg');
 const { env } = require('process');
 
 let client = new pg.Client({
-    user: env.DB_USER,
+    user: env.APP_DB_USER,
     host: env.DB_HOST,
     database: "postgres",
-    password: env.DB_PASSWORD,
+    password: env.APP_DB_PASSWORD,
     port: 5432
 });
 
