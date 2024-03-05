@@ -1,5 +1,4 @@
-FROM alpine:latest
-RUN apk update && apk upgrade && apk add nodejs npm
+FROM node:latest
 WORKDIR /app
 COPY . .
 RUN npm install

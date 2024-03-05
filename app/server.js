@@ -7,9 +7,9 @@ const { env } = require('process');
 let client = new pg.Client({
     user: env.APP_DB_USER,
     host: env.DB_HOST,
-    database: "postgres",
+    database: env.DB_NAME,
     password: env.APP_DB_PASSWORD,
-    port: 5432
+    port: env.DB_PORT
 });
 
 let requests = {

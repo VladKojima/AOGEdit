@@ -3,6 +3,8 @@ echo HC_TIMEOUT = 10s >> .env;
 echo HC_RETRIES = 6 >> .env;
 
 echo DB_HOST = db >> .env;
+echo DB_NAME = postgres >> .env;
+echo DB_PORT = 5432 >> .env;
 
 echo APP_DB_USER = app >> .env;
 
