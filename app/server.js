@@ -136,10 +136,6 @@ async function init() {
     await client.connect();
 
     http.createServer(async (req, res) => {
-        if (req.url == "/") {
-            res.end(fs.readFileSync(path.resolve('./index.html')));
-            return;
-        }
 
         if (req.url.startsWith("/api/")) {
             let command = req.url.substring(5).split("?");
@@ -163,14 +159,8 @@ async function init() {
             return;
         }
 
-        let p = path.resolve('.' + req.url);
-
-        if (fs.existsSync(p))
-            res.end(fs.readFileSync(p));
-        else {
-            res.statusCode = 404;
-            res.end("NOT FOUND");
-        }
+        res.statusCode = 404;
+        res.end("Not Found");
 
     }).listen(3000);
 
